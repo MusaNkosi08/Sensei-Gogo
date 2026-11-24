@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#007A4D">
+<meta name="description" content="Sensei Gogo: a matric study assistant that explains Grade 12 problems step by step in any South African language.">
+<title>Sensei Gogo · Matric made clear</title>
+<link rel="icon" id="favicon" href="data:,">
+<style>
+:root{--bg:#FAF6EE;--ink:#1C1C1C;--green:#007A4D;--green-2:#E3F1EA;--gold:#FFB612;--gold-2:#FFF6E0;--red:#DE3831;--muted:#5F5A50;--line:#E6DDCB;--card:#fff;--r:18px;--tab:64px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;-webkit-text-size-adjust:100%;padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+.av{display:inline-block;flex:none;width:36px;height:36px;border-radius:50%}
+.av svg,.hero-logo svg{display:block;width:100%;height:100%}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:30;background:var(--bg)}
+.hdr-in{display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto;padding:10px 16px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;background:none;border:0;padding:0;font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.brand .av{width:40px;height:40px}
+.brand b{color:var(--green)}
+.lang{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;max-width:46vw;font-size:.9rem}
+.stripe{height:12px;background:
+ linear-gradient(135deg,var(--ink) 25%,transparent 25%) -6px 0/24px 12px,
+ linear-gradient(225deg,var(--ink) 25%,transparent 25%) -6px 0/24px 12px,
+ linear-gradient(315deg,var(--ink) 25%,transparent 25%) 6px 0/24px 12px,
+ linear-gradient(45deg,var(--ink) 25%,transparent 25%) 6px 0/24px 12px,
+ repeating-linear-gradient(90deg,var(--green) 0 48px,var(--gold) 48px 96px,#fff 96px 120px,#1F4E9E 120px 168px)}
+.offline{background:var(--gold-2);border-bottom:1px solid var(--gold);text-align:center;font-size:.9rem;padding:6px 12px}
+
+/* views */
+.view{padding-top:20px;padding-bottom:28px}
+h1{font-size:clamp(1.6rem,6vw,2.3rem);line-height:1.15;margin:.3em 0 .4em;letter-spacing:-.02em}
+h2{font-size:1.05rem;margin:0 0 12px}
+.muted{color:var(--muted)}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:700;background:var(--green);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.btn.big{padding:15px 30px;font-size:1.05rem}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:7px 14px;font-size:.88rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+
+/* home */
+.hero{text-align:center;padding:10px 0 8px}
+.hero-logo{width:min(46vw,180px);height:min(46vw,180px);margin:0 auto 10px}
+.greet{font-size:1.3rem;font-weight:800;color:var(--green);margin:0}
+.hero .sub{max-width:520px;margin:0 auto 22px}
+.examples{display:grid;gap:10px;margin:28px 0}
+.ex{display:flex;flex-direction:column;gap:4px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.ex:hover{border-color:var(--green)}
+.ex small{color:var(--green);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.beads{text-align:center}
+.bracelet{width:min(70vw,230px);margin:4px auto 6px}
+.bracelet svg{display:block;width:100%;height:auto}
+.streak{font-size:1.2rem;font-weight:800;margin:4px 0 2px}
+
+/* chat */
+#v-ask{padding-bottom:230px}
+.log{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;align-items:flex-start}
+.row.me{justify-content:flex-end}
+.bubble{max-width:min(88%,620px);border-radius:var(--r);padding:12px 15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.me .bubble{background:var(--green);color:#fff;border-bottom-right-radius:6px}
+.gogo .bubble{background:#fff;border:1px solid var(--line);border-top-left-radius:6px;flex:1}
+.gogo .bubble.err{border:1.5px solid var(--red);background:#FFF5F4}
+.thinking{color:var(--muted);font-style:italic}
+.dots::after{content:'';animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.pill{display:inline-block;background:var(--green-2);color:var(--green);font-weight:700;font-size:.8rem;border-radius:999px;padding:3px 11px;margin-bottom:10px}
+.intro{margin:0 0 10px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+.steps li{display:flex;gap:10px;counter-increment:s;animation:in .25s ease}
+.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:.85rem;display:grid;place-items:center;margin-top:1px}
+@keyframes in{from{opacity:0;transform:translateY(4px)}}
+.ctrls{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.answer{border:2px solid var(--gold);background:var(--gold-2);border-radius:14px;padding:12px 14px;margin-top:14px;animation:in .25s ease}
+.lbl{display:block;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px}
+.check{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px;animation:in .25s ease}
+.try{display:flex;gap:8px;margin-top:10px}
+.try input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:10px 14px;background:var(--bg)}
+.verdict{margin-top:10px}
+.badge{display:inline-block;border-radius:999px;padding:3px 12px;font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+.badge.correct{background:var(--green);color:#fff}
+.badge.almost{background:var(--gold);color:var(--ink)}
+.badge.notyet{background:var(--red);color:#fff}
+.fb{margin:6px 0 0}
+.hint{background:var(--gold-2);border-left:4px solid var(--gold);border-radius:10px;padding:10px 14px}
+.tips{margin:0;padding-left:20px;display:grid;gap:8px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0 46px}
+.act{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.85rem}
+.act:hover{border-color:var(--green);color:var(--green)}
+.act.on{background:var(--green-2);border-color:var(--green);color:var(--green)}
+
+/* composer */
+.composer{position:fixed;left:0;right:0;bottom:calc(var(--tab) + env(safe-area-inset-bottom));z-index:20;background:var(--bg);border-top:1px solid var(--line);padding:10px 0 12px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.chip{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:.88rem;font-weight:600}
+.chip[aria-checked=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.inrow{display:flex;gap:8px;align-items:flex-end}
+.inrow textarea{flex:1;resize:none;border:1px solid var(--line);border-radius:22px;padding:11px 16px;background:#fff;max-height:140px;line-height:1.4}
+.icon{flex:none;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;display:grid;place-items:center}
+.icon svg{width:22px;height:22px}
+.icon.send{background:var(--green);border-color:var(--green);color:#fff}
+.icon.send:disabled{opacity:.5}
+.icon.on{background:var(--gold);border-color:var(--gold)}
+
+/* history */
+.tools{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
+.tools input,.tools select{border:1px solid var(--line);border-radius:999px;padding:10px 14px;background:#fff;min-width:0}
+.tools input{grid-column:1/-1}
+.hlist{display:grid;gap:10px;list-style:none;margin:0;padding:0}
+.hitem{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 12px 12px 16px}
+.hopen{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.hopen .q{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:600;margin:4px 0}
+.meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.meta .pill{margin:0;font-size:.75rem}
+.del{flex:none;border:0;background:none;width:34px;height:34px;border-radius:50%;font-size:1.3rem;line-height:1;color:var(--muted)}
+.del:hover{background:var(--bg);color:var(--ink)}
+.empty{text-align:center;padding:40px 10px}
+
+/* sheet */
+dialog{width:min(720px,calc(100vw - 16px));max-height:90dvh;border:0;border-radius:22px;padding:0;background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:rgba(28,28,28,.45)}
+.sheet-h{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--line);z-index:1}
+.sheet-b{padding:16px}
+
+/* animated gogo */
+.gogo .eye{transform-box:fill-box;transform-origin:center;transition:transform .07s ease-in}
+.gogo.blink .eye{transform:scaleY(.08)}
+.gogo .pupil{transition:transform .18s ease-out}
+.hero-logo .gogo{animation:bob 4.5s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes bob{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg) translateY(-2px)}70%{transform:rotate(3deg)}}
+.think .gogo{animation:nod 1.4s ease-in-out infinite}
+.think .gogo .pupil{transform:translate(1.6px,-1.9px)!important}
+@keyframes nod{50%{transform:translateY(-2px) rotate(-4deg)}}
+
+/* language + uploads */
+.pill.lng{background:transparent;color:var(--ink);border:1.5px solid var(--gold);margin-left:6px}
+.setup{background:var(--ink);color:#fff;font-size:.9rem;padding:8px 16px;text-align:center}
+.setup code{background:rgba(255,255,255,.15);padding:1px 6px;border-radius:6px}
+.upload{margin-bottom:18px}
+.drop{display:flex;flex-direction:column;align-items:center;gap:6px;border:2px dashed var(--line);border-radius:var(--r);padding:22px 14px;text-align:center;background:var(--bg);cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--green);background:var(--green-2)}
+.drop svg{width:30px;height:30px;color:var(--green)}
+.fprev{display:flex;gap:12px;align-items:center;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--bg)}
+.fprev img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none}
+.fprev .ficon{width:64px;height:64px;border-radius:10px;background:var(--green-2);color:var(--green);display:grid;place-items:center;font-weight:800;font-size:.8rem;flex:none}
+.fprev .fname{font-weight:700;overflow-wrap:anywhere}
+.upload textarea{width:100%;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:10px 14px;resize:vertical;min-height:60px;background:#fff}
+.upload .ctrls{margin-top:10px}
+.attach{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px 6px 6px;border:1px solid var(--line);border-radius:14px;background:#fff;width:max-content;max-width:100%}
+.attach img{width:36px;height:36px;object-fit:cover;border-radius:8px}
+.attach span{font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:52vw}
+.bubble .thumb{display:block;max-width:180px;max-height:180px;border-radius:12px;margin-bottom:6px}
+.bubble .fileTag{display:inline-block;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.2);border-radius:8px;padding:2px 8px;margin-bottom:6px}
+
+/* tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabs-in{display:flex;max-width:760px;margin:0 auto;height:var(--tab)}
+.tab{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.78rem;font-weight:600;color:var(--muted)}
+.tab svg{width:22px;height:22px}
+.tab[aria-current=page]{color:var(--green)}
+.tab[aria-current=page] svg{stroke-width:2.4}
+@media (min-width:640px){.examples{grid-template-columns:repeat(3,1fr)}.tools{grid-template-columns:1fr 200px auto}.tools input{grid-column:auto}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-in">
+    <button class="brand" id="brand" aria-label="Sensei Gogo home"><span class="av" data-logo></span><span>Sensei <b>Gogo</b></span></button>
+    <select id="lang" class="lang" aria-label="Language"></select>
+  </div>
+  <div class="stripe" aria-hidden="true"></div>
+  <div class="offline" id="offline" hidden>Offline: your history still works</div>
+  <div class="setup" id="setup" hidden></div>
+</header>
+
+<main>
+  <section class="view wrap" id="v-home" aria-label="Home">
+    <div class="hero">
+      <div class="hero-logo" data-logo></div>
+      <p class="greet" id="greet">Hello, mntwana!</p>
+      <h1>Matric made clear, one step at a time.</h1>
+      <p class="sub muted">I'm Sensei Gogo. Ask me any Grade 12 question in any South African language and we will work through it together.</p>
+      <button class="btn big" id="start">Start learning</button>
+    </div>
+    <div class="examples" id="examples">
+      <button class="ex" data-q="Solve for x: x^2 - 5x + 6 = 0"><small>Mathematics</small>Solve for x: x² − 5x + 6 = 0</button>
+      <button class="ex" data-q="A 2 kg trolley accelerates at 3 m/s^2. Use Newton's second law to find the net force on it."><small>Physical Sciences</small>A 2 kg trolley accelerates at 3 m/s². Find the net force using Newton's 2nd law.</button>
+      <button class="ex" data-q="Gogo, angiyiqondi i-gradient of a straight line. Ungangisiza ngiyithole kanjani?"><small>isiZulu + English</small>Gogo, angiyiqondi i-gradient of a straight line. Ungangisiza?</button>
+    </div>
+    <section class="card beads" aria-labelledby="beads-h">
+      <h2 id="beads-h">Gogo's Beads</h2>
+      <div class="bracelet" id="bracelet"></div>
+      <p class="streak" id="streak">0 day streak</p>
+      <p class="muted" id="encourage" style="margin:0"></p>
+    </section>
+  </section>
+
+  <section class="view wrap" id="v-ask" aria-label="Ask Gogo" hidden>
+    <div class="log" id="log" aria-live="polite"></div>
+    <form class="composer" id="composer">
+      <div class="wrap">
+        <div class="chips" id="chips" role="radiogroup" aria-label="How should Gogo answer?"></div>
+        <div class="attach" id="attach" hidden></div>
+        <div class="inrow">
+          <button type="button" class="icon" id="clip" aria-label="Upload a photo or file" title="Upload a photo or file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5l-8.2 8.2a5 5 0 0 1-7-7L13 4.4a3.3 3.3 0 0 1 4.7 4.7l-8.3 8.3a1.7 1.7 0 0 1-2.4-2.4l7.6-7.6"/></svg></button>
+          <button type="button" class="icon" id="mic" aria-label="Ask with your voice" title="Ask with your voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <textarea id="q" rows="1" maxlength="800" placeholder="Ask Gogo a matric question..." aria-label="Your question"></textarea>
+          <button class="icon send" id="send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <section class="view wrap" id="v-history" aria-label="History" hidden>
+    <section class="card upload" aria-labelledby="up-h">
+      <h2 id="up-h">Upload your homework</h2>
+      <p class="muted" style="margin:0 0 12px">Take a photo of a question or upload a worksheet. Gogo works out which language it is in and answers in that language.</p>
+      <label class="drop" id="drop" for="file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        <strong>Tap to choose a photo or file</strong>
+        <span class="muted" style="font-size:.85rem">Photos (JPG, PNG), Word (.docx) or text files</span>
+      </label>
+      <div id="upPrev"></div>
+      <div id="upMore" hidden>
+        <textarea id="upQ" maxlength="800" placeholder="Anything to add? (optional) e.g. Question 2.1 only"></textarea>
+        <div class="ctrls"><button class="btn" id="upSend" type="button">Ask Gogo about this</button><button class="btn ghost" id="upCancel" type="button">Remove</button></div>
+      </div>
+    </section>
+    <h2>Your questions</h2>
+    <div class="tools">
+      <input type="search" id="search" placeholder="Search your questions" aria-label="Search history">
+      <select id="filter" aria-label="Filter by subject"></select>
+      <button class="btn ghost sm" id="clear">Clear all</button>
+    </div>
+    <ul class="hlist" id="hlist"></ul>
+    <div class="empty muted" id="hempty" hidden></div>
+  </section>
+</main>
+
+<input type="file" id="file" accept="image/*,.txt,.md,.csv,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+<dialog id="sheet" aria-label="Saved answer">
+  <div class="sheet-h"><strong>From your history</strong><button class="btn ghost sm" id="sheet-x">Close</button></div>
+  <div class="sheet-b log" id="sheet-b"></div>
+</dialog>
+
+<nav class="tabs" aria-label="Main">
+  <div class="tabs-in">
+    <button class="tab" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button class="tab" data-view="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Ask Gogo</button>
+    <button class="tab" data-view="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>History</button>
+  </div>
+</nav>
+
+<script>
+(() => {
+'use strict';
+const $ = (s) => document.querySelector(s);
+
+const LOGO = `<svg xmlns="http://www.w3.org/2000/svg" class="gogo" viewBox="0 0 100 100" aria-hidden="true">
+<circle cx="50" cy="50" r="50" fill="#007A4D"/><circle cx="50" cy="50" r="45" fill="#FAF6EE"/>
+<path d="M23 86Q30 72 50 72Q70 72 77 86A45 45 0 0 1 23 86Z" fill="#1F4E9E"/>
+<g fill="#FFB612"><circle cx="38" cy="78" r="2"/><circle cx="44" cy="80" r="2"/><circle cx="50" cy="81" r="2"/><circle cx="56" cy="80" r="2"/><circle cx="62" cy="78" r="2"/></g>
+<rect x="44" y="62" width="12" height="12" rx="4" fill="#6E4329"/>
+<circle cx="30" cy="54" r="4.5" fill="#7A4A2E"/><circle cx="70" cy="54" r="4.5" fill="#7A4A2E"/>
+<circle cx="30" cy="60" r="2" fill="#FFB612"/><circle cx="70" cy="60" r="2" fill="#FFB612"/>
+<ellipse cx="50" cy="52" rx="20" ry="22" fill="#8A5A3C"/>
+<path d="M25 46Q22 16 50 14Q78 16 75 46Q64 33 50 33Q36 33 25 46Z" fill="#FFB612"/>
+<path d="M27 38Q50 22 73 38" fill="none" stroke="#007A4D" stroke-width="3"/>
+<path d="M29 31Q50 18 71 31" fill="none" stroke="#1F4E9E" stroke-width="2" stroke-dasharray="3 3"/>
+<path d="M50 17Q37 3 32 12Q38 20 50 19Z" fill="#007A4D"/><path d="M50 17Q63 3 68 12Q62 20 50 19Z" fill="#007A4D"/>
+<circle cx="50" cy="17" r="4" fill="#1F4E9E"/>
+<path d="M35 42Q42 39 46 42M54 42Q58 39 65 42" fill="none" stroke="#EFE8DC" stroke-width="1.8" stroke-linecap="round"/>
+<g class="eye"><ellipse cx="42" cy="52" rx="6.2" ry="6.6" fill="#fff"/><g class="pupil"><ellipse cx="42" cy="52.4" rx="4.3" ry="5.2" fill="#1C1C1C"/><circle cx="43.5" cy="50.3" r="1.8" fill="#fff"/><circle cx="40.7" cy="54.8" r=".85" fill="#fff"/></g></g>
+<g class="eye"><ellipse cx="58" cy="52" rx="6.2" ry="6.6" fill="#fff"/><g class="pupil"><ellipse cx="58" cy="52.4" rx="4.3" ry="5.2" fill="#1C1C1C"/><circle cx="59.5" cy="50.3" r="1.8" fill="#fff"/><circle cx="56.7" cy="54.8" r=".85" fill="#fff"/></g></g>
+<circle cx="42" cy="52" r="8" fill="#fff" fill-opacity=".1" stroke="#1C1C1C" stroke-width="1.8"/>
+<circle cx="58" cy="52" r="8" fill="#fff" fill-opacity=".1" stroke="#1C1C1C" stroke-width="1.8"/>
+<path d="M48.5 51Q50 49.5 51.5 51" fill="none" stroke="#1C1C1C" stroke-width="1.6"/>
+<ellipse cx="35" cy="62" rx="3.4" ry="2.2" fill="#E8957A" opacity=".7"/><ellipse cx="65" cy="62" rx="3.4" ry="2.2" fill="#E8957A" opacity=".7"/>
+<path d="M44 64Q50 70 56 64" fill="none" stroke="#1C1C1C" stroke-width="1.8" stroke-linecap="round"/>
+</svg>`;
+
+const LANGS = [
+  ['auto', 'Auto (match me)', 'Hello', 'en-ZA'],
+  ['English', 'English', 'Hello', 'en-ZA'],
+  ['Afrikaans', 'Afrikaans', 'Hallo', 'af-ZA'],
+  ['isiZulu', 'isiZulu', 'Sawubona', 'zu-ZA'],
+  ['isiXhosa', 'isiXhosa', 'Molo', 'xh-ZA'],
+  ['isiNdebele', 'isiNdebele', 'Lotjhani', 'nr-ZA'],
+  ['siSwati', 'siSwati', 'Sawubona', 'ss-ZA'],
+  ['Sesotho', 'Sesotho', 'Lumela', 'st-ZA'],
+  ['Sepedi', 'Sepedi', 'Thobela', 'nso-ZA'],
+  ['Setswana', 'Setswana', 'Dumela', 'tn-ZA'],
+  ['Xitsonga', 'Xitsonga', 'Avuxeni', 'ts-ZA'],
+  ['Tshivenda', 'Tshivenda', 'Ndaa', 've-ZA'],
+];
+const MODES = { steps: 'Step by step', hint: 'Hint only', kasi: 'Kasi example', exam: 'Exam tips' };
+const BEADS = ['#007A4D', '#FFB612', '#DE3831', '#1F4E9E', '#1C1C1C', '#FFFFFF'];
+const K = { lang: 'sg.lang', mode: 'sg.mode', hist: 'sg.history', beads: 'sg.beads' };
+
+const get = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } };
+const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function el(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'text') e.textContent = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return e;
+}
+const avatar = () => { const a = el('span', { class: 'av', 'aria-hidden': 'true' }); a.innerHTML = LOGO; return a; };
+
+let lang = get(K.lang, 'auto'); if (!LANGS.some((l) => l[0] === lang)) lang = 'auto';
+let mode = get(K.mode, 'steps'); if (!MODES[mode]) mode = 'steps';
+let convo = [];
+let busy = false;
+const langInfo = () => LANGS.find((l) => l[0] === lang) || LANGS[0];
+
+/* ---------- logo + favicon ---------- */
+document.querySelectorAll('[data-logo]').forEach((n) => { n.innerHTML = LOGO; });
+$('#favicon').href = 'data:image/svg+xml,' + encodeURIComponent(LOGO);
+
+/* ---------- language ---------- */
+const langSel = $('#lang');
+for (const [v, label] of LANGS) langSel.append(el('option', { value: v, text: label }));
+langSel.value = lang;
+langSel.addEventListener('change', () => { lang = langSel.value; put(K.lang, lang); paintGreeting(); });
+function paintGreeting() {
+  $('#greet').textContent = `${langInfo()[2]}, mntwana!`;
+  const intro = $('#intro-text');
+  if (intro) intro.textContent = introText();
+}
+const introText = () => `${langInfo()[2]}, mntwana! Ask me anything from your matric subjects. Choose how you want me to answer below, then send your question.`;
+
+/* ---------- views ---------- */
+const views = { home: $('#v-home'), ask: $('#v-ask'), history: $('#v-history') };
+function setView(name) {
+  for (const [k, v] of Object.entries(views)) v.hidden = k !== name;
+  document.querySelectorAll('.tab').forEach((t) => {
+    if (t.dataset.view === name) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
+  });
+  if (name === 'history') renderHistory();
+  if (name === 'home') renderBeads();
+  if (name === 'ask') scrollDown(false); else window.scrollTo(0, 0);
+}
+document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => setView(t.dataset.view)));
+$('#brand').addEventListener('click', () => setView('home'));
+$('#start').addEventListener('click', () => { setView('ask'); $('#q').focus(); });
+$('#examples').addEventListener('click', (e) => { const b = e.target.closest('[data-q]'); if (b) ask(b.dataset.q, mode); });
+
+/* ---------- offline ---------- */
+const net = () => { $('#offline').hidden = navigator.onLine; };
+addEventListener('online', net); addEventListener('offline', net); net();
+
+/* ---------- beads ---------- */
+function dayKey(off = 0) {
+  const d = new Date(); d.setDate(d.getDate() + off);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function streakNow() {
+  const b = get(K.beads, null);
+  if (!b || !b.last) return 0;
+  return b.last === dayKey() || b.last === dayKey(-1) ? b.count : 0;
+}
+function addBead() {
+  const b = get(K.beads, { last: '', count: 0 });
+  const today = dayKey();
+  if (b.last === today) return;
+  b.count = b.last === dayKey(-1) ? b.count + 1 : 1;
+  b.last = today;
+  put(K.beads, b);
+  renderBeads();
+}
+function renderBeads() {
+  const n = streakNow();
+  const b = get(K.beads, {});
+  const slots = Math.min(Math.max(14, n), 60);
+  const R = 68, C = 90;
+  const br = Math.min(10, (Math.PI * R) / slots * 0.82);
+  let s = `<svg viewBox="0 0 180 180" role="img" aria-label="${esc(n)} bead bracelet"><circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#C9BEAA" stroke-width="2"/>`;
+  for (let i = 0; i < slots; i++) {
+    const a = (i / slots) * Math.PI * 2 - Math.PI / 2;
+    const x = (C + R * Math.cos(a)).toFixed(2), y = (C + R * Math.sin(a)).toFixed(2);
+    if (i < n) {
+      const col = BEADS[i % BEADS.length];
+      s += `<circle cx="${x}" cy="${y}" r="${br.toFixed(2)}" fill="${col}" stroke="${col === '#FFFFFF' ? '#BDB29E' : 'rgba(0,0,0,.15)'}" stroke-width="1"/>`;
+      s += `<circle cx="${(+x - br * 0.35).toFixed(2)}" cy="${(+y - br * 0.35).toFixed(2)}" r="${(br * 0.28).toFixed(2)}" fill="#fff" opacity="${col === '#FFFFFF' ? 0 : 0.45}"/>`;
+    } else {
+      s += `<circle cx="${x}" cy="${y}" r="${(br * 0.55).toFixed(2)}" fill="#FAF6EE" stroke="#D8CEBB" stroke-width="1.2" stroke-dasharray="2 2"/>`;
+    }
+  }
+  s += `<text x="${C}" y="${C + 4}" text-anchor="middle" font-size="40" font-weight="800" fill="#1C1C1C" font-family="system-ui,sans-serif">${n}</text>`;
+  s += `<text x="${C}" y="${C + 24}" text-anchor="middle" font-size="12" fill="#5F5A50" font-family="system-ui,sans-serif">${n === 1 ? 'bead' : 'beads'}</text></svg>`;
+  $('#bracelet').innerHTML = s;
+  $('#streak').textContent = `${n} day streak`;
+  let line;
+  if (n === 0) line = 'Ask one question today and Gogo will thread your first bead.';
+  else if (b.last !== dayKey()) line = 'Ask one question today to keep your bracelet growing, mntwana.';
+  else if (n === 1) line = 'Your first bead! Come back tomorrow for the next one.';
+  else if (n < 5) line = 'Bead by bead, the bracelet grows. Keep going, mntwana.';
+  else if (n < 10) line = 'Look at you! Showing up every day is how matric is won.';
+  else line = 'This bracelet is becoming a crown. Gogo is so proud of you.';
+  $('#encourage').textContent = line;
+}
+
+/* ---------- history store ---------- */
+const hist = () => get(K.hist, []);
+function saveHist(list) {
+  while (!put(K.hist, list) && list.length > 5) list = list.slice(0, Math.floor(list.length * 0.8));
+}
+function addHist(item) { const l = hist(); l.unshift(item); saveHist(l.slice(0, 300)); }
+function patchHist(id, patch) { const l = hist(); const it = l.find((x) => x.id === id); if (it) { Object.assign(it, patch); saveHist(l); } }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+/* ---------- parse replies ---------- */
+const clean = (t) => String(t || '').replace(/\r/g, '').replace(/\*\*|__|`/g, '').replace(/^#{1,6}\s*/gm, '').trim();
+function verdictOf(v) {
+  const s = v.toLowerCase();
+  if (/not\s*yet|incorrect|wrong/.test(s)) return 'not yet';
+  if (/almost|nearly|close/.test(s)) return 'almost';
+  if (/correct|right/.test(s)) return 'correct';
+  return '';
+}
+function parse(raw) {
+  const out = { subject: '', steps: [], answer: '', check: '', hint: '', tips: [], verdict: '', feedback: [], plain: [] };
+  const re = /^\s*(?:[-•]\s*)?(LANG(?:UAGE)?|SUBJECT|STEP\s*\d+|ANSWER|CHECK|HINT|TIP\s*\d*|VERDICT|FEEDBACK)\s*[:：]\s*(.*)$/i;
+  let cur = null;
+  for (const line of clean(raw).split('\n')) {
+    const m = line.match(re);
+    if (m) {
+      const key = m[1].toUpperCase().replace(/\s+/g, '');
+      const val = m[2].trim();
+      if (key.startsWith('LANG')) cur = null;
+      else if (key === 'SUBJECT') { out.subject = val.replace(/[.\s]+$/, ''); cur = null; }
+      else if (key.startsWith('STEP')) { out.steps.push(val); cur = out.steps; }
+      else if (key.startsWith('TIP')) { out.tips.push(val); cur = out.tips; }
+      else if (key === 'FEEDBACK') { if (val) out.feedback.push(val); cur = out.feedback; }
+      else if (key === 'VERDICT') {
+        out.verdict = verdictOf(val);
+        const rest = val.replace(/^(not\s*yet|almost|correct)[\s.,:;!\-–]*/i, '').trim();
+        if (rest) out.feedback.push(rest);
+        cur = out.feedback;
+      } else { out[key.toLowerCase()] = val; cur = key.toLowerCase(); }
+      continue;
+    }
+    const t = line.trim();
+    if (!t) { if (!cur && out.plain.length) out.plain.push(''); continue; }
+    if (cur === out.feedback) cur.push(t);
+    else if (Array.isArray(cur)) cur[cur.length - 1] += '\n' + t;
+    else if (cur) out[cur] += (out[cur] ? '\n' : '') + t;
+    else out.plain.push(line);
+  }
+  out.plainText = out.plain.join('\n').trim();
+  if (out.subject) out.subject = out.subject.charAt(0).toUpperCase() + out.subject.slice(1);
+  return out;
+}
+function speechText(reply) {
+  const p = parse(reply);
+  const parts = [];
+  if (p.plainText) parts.push(p.plainText);
+  if (p.subject) parts.push(p.subject + '.');
+  p.steps.forEach((s, i) => parts.push(`Step ${i + 1}. ${s}`));
+  if (p.answer) parts.push('Answer. ' + p.answer);
+  if (p.check) parts.push('Try this one. ' + p.check);
+  if (p.hint) parts.push('Hint. ' + p.hint);
+  p.tips.forEach((t) => parts.push(t));
+  if (p.verdict) parts.push(p.verdict + '.');
+  parts.push(...p.feedback);
+  return (parts.join('\n') || clean(reply)).replace(/\^2/g, ' squared').replace(/\^(\d)/g, ' to the power $1');
+}
+
+/* ---------- rendering ---------- */
+const scrollDown = (smooth = true) => requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: smooth ? 'smooth' : 'auto' }));
+const log = $('#log');
+
+function userRow(text) { return el('div', { class: 'row me' }, el('div', { class: 'bubble', text })); }
+function gogoRow(content, extraClass) {
+  const bubble = el('div', { class: 'bubble' + (extraClass ? ' ' + extraClass : '') });
+  bubble.append(...[].concat(content));
+  return el('div', { class: 'row gogo' }, avatar(), bubble);
+}
+function verdictEl(v, feedback) {
+  const box = el('div', { class: 'verdict' });
+  if (v) box.append(el('span', { class: 'badge ' + v.replace(/\s/g, ''), text: v === 'not yet' ? 'Not yet' : v === 'almost' ? 'Almost' : 'Correct' }));
+  if (feedback) box.append(el('p', { class: 'fb', text: feedback }));
+  return box;
+}
+
+function renderCard(item, ctx) {
+  const p = parse(item.reply);
+  const frag = [];
+  if (p.subject || item.lang) {
+    frag.push(el('div', {},
+      p.subject ? el('span', { class: 'pill', text: p.subject }) : null,
+      item.lang ? el('span', { class: 'pill lng', title: 'Language Gogo answered in', text: item.lang }) : null));
+  }
+  if (p.plainText) frag.push(el('p', { class: 'intro', text: p.plainText }));
+
+  if (p.steps.length) {
+    const ol = el('ol', { class: 'steps' });
+    const after = el('div', { hidden: true });
+    let shown = 0;
+    const next = el('button', { class: 'btn sm', type: 'button', text: 'Next step' });
+    const all = el('button', { class: 'btn ghost sm', type: 'button', text: 'Show all' });
+    const ctrls = el('div', { class: 'ctrls' }, next, all);
+    const reveal = (k) => {
+      while (shown < Math.min(k, p.steps.length)) ol.append(el('li', {}, el('span', { text: p.steps[shown++] })));
+      if (shown >= p.steps.length) { ctrls.hidden = true; after.hidden = false; }
+      if (ctx !== 'sheet') scrollDown();
+    };
+    next.addEventListener('click', () => reveal(shown + 1));
+    all.addEventListener('click', () => reveal(p.steps.length));
+    if (p.answer) after.append(el('div', { class: 'answer' }, el('span', { class: 'lbl', text: 'Answer' }), el('span', { text: p.answer })));
+    if (p.check) {
+      const slot = el('div');
+      if (item.verdict) slot.append(verdictEl(item.verdict, item.feedback || ''));
+      const input = el('input', { type: 'text', placeholder: 'Try it, mntwana', 'aria-label': 'Your answer', maxlength: '400' });
+      const btn = el('button', { class: 'btn sm', type: 'submit', text: 'Check' });
+      const form = el('form', { class: 'try' }, input, btn);
+      form.addEventListener('submit', (e) => { e.preventDefault(); markAnswer(item, input, btn, slot); });
+      after.append(el('div', { class: 'check' }, el('span', { class: 'lbl', text: 'Your turn' }), el('div', { text: p.check }), form, slot));
+    }
+    frag.push(ol, ctrls, after);
+    // show the first step right away
+    while (shown < 1 && p.steps.length) ol.append(el('li', {}, el('span', { text: p.steps[shown++] })));
+    if (shown >= p.steps.length) { ctrls.hidden = true; after.hidden = false; }
+  } else if (p.hint) {
+    frag.push(el('div', { class: 'hint' }, el('span', { class: 'lbl', text: 'Hint' }), el('span', { text: p.hint })));
+  } else if (p.tips.length) {
+    frag.push(el('span', { class: 'lbl', text: 'Exam tips' }), el('ul', { class: 'tips' }, p.tips.map((t) => el('li', { text: t }))));
+  } else if (p.verdict) {
+    frag.push(verdictEl(p.verdict, p.feedback.join('\n')));
+  }
+  if (!frag.length) frag.push(el('div', { text: clean(item.reply) }));
+  return frag;
+}
+
+function gogoReply(item, ctx) {
+  const row = gogoRow(renderCard(item, ctx));
+  const acts = el('div', { class: 'acts' });
+  acts.append(el('button', { class: 'act', type: 'button', text: 'Explain differently', onclick: () => {
+    if (ctx === 'sheet') $('#sheet').close();
+    ask(item.q, 'kasi', {
+      display: 'Explain differently: ' + item.q,
+      context: [{ role: 'user', content: item.q }, { role: 'assistant', content: item.reply }],
+      lang: item.lang,
+    });
+  } }));
+  if ('speechSynthesis' in window) {
+    const rb = el('button', { class: 'act', type: 'button', text: 'Read aloud' });
+    rb.addEventListener('click', () => speak(speechText(item.reply), rb, item.lang));
+    acts.append(rb);
+  }
+  const saved = () => (hist().find((x) => x.id === item.id) || item).saved;
+  const sb = el('button', { class: 'act', type: 'button' });
+  const paintSave = () => { const on = !!saved(); sb.textContent = on ? 'Saved ✓' : 'Save'; sb.classList.toggle('on', on); sb.setAttribute('aria-pressed', on); };
+  sb.addEventListener('click', () => { const on = !saved(); item.saved = on; patchHist(item.id, { saved: on }); paintSave(); });
+  paintSave();
+  acts.append(sb);
+  return el('div', {}, row, acts);
+}
+
+function thinkingRow() {
+  const r = gogoRow(el('span', { class: 'thinking' }, 'Gogo is thinking', el('span', { class: 'dots' })), '');
+  r.classList.add('think');
+  return r;
+}
+
+/* ---------- api ---------- */
+// Works when served by server.js, and also when index.html is opened directly or from another dev server.
+const FALLBACK_API = 'http://localhost:3000';
+let apiBase = location.protocol === 'file:' ? FALLBACK_API : '';
+async function api(path, body) {
+  const opts = body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+  try {
+    const res = await fetch(apiBase + path, opts);
+    if ((res.status === 404 || res.status === 405 || res.status === 501) && apiBase === '' && location.origin !== FALLBACK_API) throw new Error('wrong server');
+    return res;
+  } catch (e) {
+    if (apiBase !== '' || location.origin === FALLBACK_API) throw e;
+    const res = await fetch(FALLBACK_API + path, opts); // throws if server.js is not running
+    apiBase = FALLBACK_API;
+    return res;
+  }
+}
+
+async function callGogo(messages, m, extra = {}) {
+  if (!navigator.onLine) throw new Error("You're offline, mntwana. Gogo needs the internet to answer, but your history still works.");
+  let res;
+  try {
+    res = await api('/api/chat', { messages, lang: extra.lang || lang, mode: m, attachment: extra.attachment || undefined });
+  } catch {
+    throw new Error("Gogo can't reach her server. Start it with \"node server.js\" and open http://localhost:3000.");
+  }
+  let data = {};
+  try { data = await res.json(); } catch {}
+  if (!res.ok || !data.reply) throw new Error(data.error || 'Something went wrong. Please try again, mntwana.');
+  return data;
+}
+
+// opts: { display, context, lang, attachment }
+async function ask(text, m, opts = {}) {
+  if (typeof opts === 'string') opts = { display: opts };
+  const att = opts.attachment || null;
+  text = String(text || '').trim().slice(0, 800);
+  if ((!text && !att) || busy) return false;
+  setView('ask');
+  busy = true; $('#send').disabled = true;
+  const shown = opts.display || text;
+  const ub = el('div', { class: 'bubble' });
+  if (att && att.thumb) ub.append(el('img', { class: 'thumb', src: att.thumb, alt: att.name }));
+  else if (att) ub.append(el('span', { class: 'fileTag', text: 'File: ' + att.name }));
+  if (shown) ub.append(el('div', { text: shown }));
+  log.append(el('div', { class: 'row me' }, ub));
+  const wait = thinkingRow();
+  log.append(wait); scrollDown();
+  const sendText = text || '(See the uploaded ' + (att && att.kind === 'image' ? 'photo' : 'file') + '.)';
+  const base = opts.context || convo.slice(-7);
+  const messages = base.concat({ role: 'user', content: sendText });
+  try {
+    const data = await callGogo(messages, m, { lang: opts.lang, attachment: att && (att.kind === 'image' ? { kind: 'image', name: att.name, dataUrl: att.dataUrl } : { kind: 'text', name: att.name, text: att.text }) });
+    const memo = att ? `[Uploaded ${att.name}] ${text}${att.kind === 'text' ? '\n' + att.text.slice(0, 500) : ''}` : text;
+    convo.push({ role: 'user', content: memo.trim() }, { role: 'assistant', content: data.reply });
+    convo = convo.slice(-16);
+    const item = {
+      id: uid(), q: text || att.name, subject: parse(data.reply).subject || 'General', mode: m, reply: data.reply,
+      lang: data.lang || '', verdict: '', date: Date.now(), saved: false,
+      file: att ? { name: att.name, kind: att.kind, thumb: att.thumb || '' } : null,
+    };
+    addHist(item);
+    addBead();
+    wait.replaceWith(gogoReply(item, 'chat'));
+    return true;
+  } catch (e) {
+    wait.replaceWith(gogoRow(el('span', { text: 'Eish! ' + e.message }), 'err'));
+    return false;
+  } finally {
+    busy = false; $('#send').disabled = false; scrollDown();
+  }
+}
+
+async function markAnswer(item, input, btn, slot) {
+  const answer = input.value.trim();
+  if (!answer) { input.focus(); return; }
+  btn.disabled = true; input.disabled = true;
+  slot.replaceChildren(el('p', { class: 'thinking' }, 'Gogo is marking', el('span', { class: 'dots' })));
+  try {
+    const { reply } = await callGogo([
+      { role: 'user', content: item.q },
+      { role: 'assistant', content: item.reply },
+      { role: 'user', content: answer },
+    ], 'mark', { lang: item.lang });
+    const p = parse(reply);
+    const fb = p.feedback.join('\n') || p.plainText || (p.verdict ? '' : clean(reply));
+    slot.replaceChildren(verdictEl(p.verdict, fb));
+    if (p.verdict) { item.verdict = p.verdict; item.feedback = fb; patchHist(item.id, { verdict: p.verdict, feedback: fb }); }
+  } catch (e) {
+    slot.replaceChildren(el('p', { class: 'fb', style: 'color:#DE3831', text: 'Eish! ' + e.message }));
+  } finally {
+    btn.disabled = false; input.disabled = false;
+  }
+}
+
+/* ---------- speech ---------- */
+let speakingBtn = null;
+function speak(text, btn, replyLang) {
+  const ss = window.speechSynthesis;
+  const wasMe = speakingBtn === btn;
+  if (ss.speaking || ss.pending) { ss.cancel(); if (speakingBtn) speakingBtn.textContent = 'Read aloud'; speakingBtn = null; if (wasMe) return; }
+  const u = new SpeechSynthesisUtterance(text);
+  const code = ((replyLang && LANGS.find((l) => l[0] === replyLang)) || langInfo())[3].toLowerCase();
+  const base = code.split('-')[0];
+  const norm = (v) => v.lang.replace('_', '-').toLowerCase();
+  const voices = ss.getVoices();
+  const v = voices.find((x) => norm(x) === code) || voices.find((x) => norm(x).split('-')[0] === base) || voices.find((x) => norm(x) === 'en-za');
+  if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'en-ZA';
+  u.rate = 0.95;
+  const done = () => { btn.textContent = 'Read aloud'; if (speakingBtn === btn) speakingBtn = null; };
+  u.onend = done; u.onerror = done;
+  btn.textContent = 'Stop reading';
+  speakingBtn = btn;
+  ss.speak(u);
+}
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+/* ---------- composer ---------- */
+const q = $('#q');
+const chips = $('#chips');
+for (const [k, label] of Object.entries(MODES)) {
+  chips.append(el('button', { class: 'chip', type: 'button', role: 'radio', 'data-mode': k, 'aria-checked': String(k === mode), text: label }));
+}
+chips.addEventListener('click', (e) => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  mode = c.dataset.mode; put(K.mode, mode);
+  chips.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-checked', String(x === c)));
+});
+const autosize = () => { q.style.height = 'auto'; q.style.height = Math.min(q.scrollHeight, 140) + 'px'; };
+q.addEventListener('input', autosize);
+q.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#composer').requestSubmit(); } });
+$('#composer').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const text = q.value.trim();
+  const att = chatFile;
+  if ((!text && !att) || busy) { q.focus(); return; }
+  q.value = ''; autosize();
+  setChatFile(null);
+  const ok = await ask(text, mode, { attachment: att });
+  if (!ok && att) setChatFile(att); // keep the file so they can retry
+});
+
+const SR = window.webkitSpeechRecognition || window.SpeechRecognition;
+const mic = $('#mic');
+if (!SR) mic.hidden = true;
+else {
+  let rec = null;
+  mic.addEventListener('click', () => {
+    if (rec) { rec.stop(); return; }
+    rec = new SR();
+    // Browsers recognise isiZulu and Afrikaans speech; other languages fall back to en-ZA.
+    rec.lang = ({ isiZulu: 'zu-ZA', Afrikaans: 'af-ZA' })[lang] || 'en-ZA';
+    rec.interimResults = true; rec.continuous = false;
+    const before = q.value.trim();
+    rec.onresult = (e) => {
+      let t = ''; for (const r of e.results) t += r[0].transcript;
+      q.value = (before ? before + ' ' : '') + t; autosize();
+    };
+    rec.onend = () => { rec = null; mic.classList.remove('on'); mic.setAttribute('aria-label', 'Ask with your voice'); q.focus(); };
+    rec.onerror = () => {};
+    try { rec.start(); mic.classList.add('on'); mic.setAttribute('aria-label', 'Stop listening'); } catch { rec = null; }
+  });
+}
+
+/* ---------- history view ---------- */
+const search = $('#search'), filter = $('#filter'), hlist = $('#hlist'), hempty = $('#hempty');
+function renderHistory() {
+  const list = hist();
+  const prev = filter.value || 'all';
+  const subjects = [...new Set(list.map((i) => i.subject || 'General'))].sort();
+  filter.replaceChildren(el('option', { value: 'all', text: 'All subjects' }), el('option', { value: '__saved', text: 'Saved only' }), ...subjects.map((s) => el('option', { value: s, text: s })));
+  filter.value = [...filter.options].some((o) => o.value === prev) ? prev : 'all';
+  const term = search.value.trim().toLowerCase();
+  const f = filter.value;
+  const items = list.filter((i) => (f === 'all' || (f === '__saved' ? i.saved : i.subject === f)) && (!term || (i.q + ' ' + i.reply + ' ' + i.subject).toLowerCase().includes(term)));
+  $('#clear').hidden = !list.length;
+  hlist.replaceChildren(...items.map((i) => {
+    const meta = el('div', { class: 'meta' },
+      el('span', { class: 'pill', text: i.subject || 'General' }),
+      el('span', { text: MODES[i.mode] || i.mode }),
+      el('span', { text: '· ' + new Date(i.date).toLocaleString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) }),
+      i.saved ? el('span', { text: '· Saved ✓' }) : null,
+      i.verdict ? el('span', { class: 'badge ' + i.verdict.replace(/\s/g, ''), style: 'font-size:.7rem;padding:1px 8px', text: i.verdict }) : null);
+    const open = el('button', { class: 'hopen', type: 'button', onclick: () => openSheet(i.id) }, meta, el('span', { class: 'q', text: i.q }));
+    const del = el('button', { class: 'del', type: 'button', 'aria-label': 'Delete this question', title: 'Delete', text: '×', onclick: () => { saveHist(hist().filter((x) => x.id !== i.id)); renderHistory(); } });
+    return el('li', { class: 'hitem' }, open, del);
+  }));
+  hempty.hidden = items.length > 0;
+  hempty.textContent = list.length ? 'Nothing matches that search, mntwana.' : 'No questions yet. Ask Gogo something and it will be kept here, even offline.';
+}
+search.addEventListener('input', renderHistory);
+filter.addEventListener('change', renderHistory);
+$('#clear').addEventListener('click', () => { if (confirm('Clear all your history? This cannot be undone.')) { saveHist([]); renderHistory(); } });
+
+const sheet = $('#sheet');
+function openSheet(id) {
+  const item = hist().find((x) => x.id === id);
+  if (!item) return;
+  $('#sheet-b').replaceChildren(userRow(item.q), gogoReply(item, 'sheet'));
+  if (sheet.showModal) sheet.showModal(); else sheet.setAttribute('open', '');
+}
+$('#sheet-x').addEventListener('click', () => sheet.close());
+sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.close(); });
+sheet.addEventListener('close', () => { if (window.speechSynthesis) speechSynthesis.cancel(); renderHistory(); });
+
+/* ---------- uploads ---------- */
+const MAX_TEXT = 4000;
+function decodeXml(s) {
+  return s.replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(+d))
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+}
+// Minimal .docx reader: find word/document.xml inside the zip and inflate it with the browser's DecompressionStream.
+async function docxText(buf) {
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('bad zip');
+  let off = dv.getUint32(eocd + 16, true);
+  const count = dv.getUint16(eocd + 10, true);
+  for (let k = 0; k < count; k++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true), csize = dv.getUint32(off + 20, true);
+    const nlen = dv.getUint16(off + 28, true), xlen = dv.getUint16(off + 30, true), clen = dv.getUint16(off + 32, true), loc = dv.getUint32(off + 42, true);
+    const name = new TextDecoder().decode(u8.subarray(off + 46, off + 46 + nlen));
+    if (name === 'word/document.xml') {
+      const start = loc + 30 + dv.getUint16(loc + 26, true) + dv.getUint16(loc + 28, true);
+      const data = u8.subarray(start, start + csize);
+      let xml;
+      if (method === 0) xml = new TextDecoder().decode(data);
+      else if (method === 8 && 'DecompressionStream' in window) xml = new TextDecoder().decode(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+      else throw new Error('unsupported');
+      return decodeXml(xml.replace(/<w:tab\/>/g, ' ').replace(/<w:br[^>]*\/>/g, '\n').replace(/<\/w:p>/g, '\n').replace(/<[^>]+>/g, '')).replace(/\n{3,}/g, '\n\n').trim();
+    }
+    off += 46 + nlen + xlen + clen;
+  }
+  throw new Error('no document');
+}
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('img')); };
+    img.src = url;
+  });
+}
+function shrink(img, max, quality) {
+  const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement('canvas');
+  c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', quality);
+}
+async function readAttachment(file) {
+  const name = file.name || 'upload';
+  const ext = (name.split('.').pop() || '').toLowerCase();
+  if (file.size > 15 * 1024 * 1024) throw new Error('That file is bigger than 15 MB. Try a smaller one, mntwana.');
+  if (file.type.startsWith('image/')) {
+    let img;
+    try { img = await loadImage(file); } catch { throw new Error("Gogo can't open that picture. Try a JPG or PNG photo."); }
+    return { kind: 'image', name, dataUrl: shrink(img, 1400, 0.85), thumb: shrink(img, 160, 0.6) };
+  }
+  let text = '';
+  if (ext === 'docx') {
+    try { text = await docxText(await file.arrayBuffer()); } catch { throw new Error("Gogo couldn't read that Word file. Save it again as .docx, or take a photo of the question."); }
+  } else if (ext === 'pdf') {
+    throw new Error('Gogo cannot read PDFs yet. Take a screenshot or photo of the question and upload that instead.');
+  } else if (file.type.startsWith('text/') || ['txt', 'md', 'csv'].includes(ext)) {
+    text = await file.text();
+  } else {
+    throw new Error('Gogo can read photos, Word (.docx) and text files.');
+  }
+  text = text.trim();
+  if (!text) throw new Error('That file looks empty. Try a photo of the question instead.');
+  return { kind: 'text', name, text: text.slice(0, MAX_TEXT), cut: text.length > MAX_TEXT };
+}
+async function detectFor(att) {
+  if (att.kind !== 'text') return null;
+  try { const r = await api('/api/detect', { text: att.text }); const d = await r.json(); return d.lang || null; } catch { return null; }
+}
+function previewEl(att, detected) {
+  const media = att.thumb ? el('img', { src: att.thumb, alt: '' }) : el('div', { class: 'ficon', text: (att.name.split('.').pop() || 'TXT').toUpperCase().slice(0, 4) });
+  let note;
+  if (att.kind === 'image') note = 'Gogo will read the language from the photo and answer in it.';
+  else if (detected) note = `Language found: ${detected}. Gogo will answer in ${detected}.`;
+  else note = 'Gogo will answer in the language the file is written in.';
+  if (att.cut) note += ' Only the first part of a long file is sent.';
+  return el('div', { class: 'fprev' }, media, el('div', {}, el('div', { class: 'fname', text: att.name }), el('div', { class: 'muted', style: 'font-size:.88rem', text: note })));
+}
+
+const fileInput = $('#file');
+let fileTarget = 'upload';
+let upFile = null;
+let chatFile = null;
+function setChatFile(att) {
+  chatFile = att;
+  const box = $('#attach');
+  box.hidden = !att;
+  if (!att) { box.replaceChildren(); return; }
+  box.replaceChildren(
+    att.thumb ? el('img', { src: att.thumb, alt: '' }) : el('div', { class: 'ficon', style: 'width:36px;height:36px;font-size:.6rem;border-radius:8px;background:var(--green-2);color:var(--green);display:grid;place-items:center;font-weight:800', text: (att.name.split('.').pop() || '').toUpperCase().slice(0, 4) }),
+    el('span', { text: att.name }),
+    el('button', { class: 'del', type: 'button', 'aria-label': 'Remove file', text: '×', onclick: () => setChatFile(null) }));
+}
+async function setUpFile(att) {
+  upFile = att;
+  $('#upMore').hidden = !att;
+  $('#drop').hidden = !!att;
+  if (!att) { $('#upPrev').replaceChildren(); $('#upQ').value = ''; return; }
+  $('#upPrev').replaceChildren(previewEl(att, null));
+  const d = await detectFor(att);
+  if (upFile === att && d) $('#upPrev').replaceChildren(previewEl(att, d));
+}
+async function takeFile(file) {
+  if (!file) return;
+  const target = fileTarget;
+  try {
+    const att = await readAttachment(file);
+    if (target === 'chat') { setChatFile(att); q.focus(); } else setUpFile(att);
+  } catch (e) {
+    if (target === 'chat') log.append(gogoRow(el('span', { text: 'Eish! ' + e.message }), 'err')), scrollDown();
+    else $('#upPrev').replaceChildren(el('p', { class: 'fb', style: 'color:#DE3831', text: 'Eish! ' + e.message }));
+  }
+}
+fileInput.addEventListener('change', () => { takeFile(fileInput.files[0]); fileInput.value = ''; });
+$('#clip').addEventListener('click', () => { fileTarget = 'chat'; fileInput.click(); });
+const drop = $('#drop');
+drop.addEventListener('click', () => { fileTarget = 'upload'; });
+drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); fileTarget = 'upload'; takeFile(e.dataTransfer.files[0]); });
+$('#upCancel').addEventListener('click', () => setUpFile(null));
+$('#upSend').addEventListener('click', async () => {
+  if (!upFile || busy) return;
+  const att = upFile, extra = $('#upQ').value.trim();
+  setUpFile(null);
+  await ask(extra, mode, { attachment: att });
+});
+
+/* ---------- animated gogo: blinking and eyes that follow you ---------- */
+const pointer = { x: innerWidth / 2, y: innerHeight * 0.3, active: false, t: 0 };
+let eyeFrame = 0;
+function lookAt() {
+  eyeFrame = 0;
+  const idle = Date.now() - pointer.t > 4000;
+  document.querySelectorAll('svg.gogo').forEach((svg) => {
+    const r = svg.getBoundingClientRect();
+    if (!r.width || r.bottom < 0 || r.top > innerHeight) return;
+    svg.querySelectorAll('.pupil').forEach((p, i) => {
+      if (idle) { p.style.transform = ''; return; }
+      const ex = r.left + r.width * (i ? 0.58 : 0.42), ey = r.top + r.height * 0.52;
+      const dx = pointer.x - ex, dy = pointer.y - ey;
+      const d = Math.hypot(dx, dy) || 1;
+      const pull = Math.min(1, d / (r.width * 1.5));
+      p.style.transform = `translate(${(dx / d * 1.9 * pull).toFixed(2)}px,${(dy / d * 1.5 * pull).toFixed(2)}px)`;
+    });
+  });
+}
+function track(e) {
+  const pt = e.touches ? e.touches[0] : e;
+  if (!pt) return;
+  pointer.x = pt.clientX; pointer.y = pt.clientY; pointer.t = Date.now();
+  if (!eyeFrame) eyeFrame = requestAnimationFrame(lookAt);
+}
+addEventListener('pointermove', track, { passive: true });
+addEventListener('pointerdown', track, { passive: true });
+addEventListener('touchstart', track, { passive: true });
+addEventListener('scroll', () => { if (!eyeFrame) eyeFrame = requestAnimationFrame(lookAt); }, { passive: true });
+setInterval(() => { if (Date.now() - pointer.t > 4000) lookAt(); }, 1500);
+function blink(times = 1) {
+  const all = document.querySelectorAll('svg.gogo');
+  all.forEach((s) => s.classList.add('blink'));
+  setTimeout(() => {
+    all.forEach((s) => s.classList.remove('blink'));
+    if (times > 1) setTimeout(() => blink(times - 1), 140);
+  }, 130);
+}
+(function blinkLoop() {
+  setTimeout(() => { if (!document.hidden) blink(Math.random() < 0.25 ? 2 : 1); blinkLoop(); }, 2200 + Math.random() * 3800);
+})();
+
+/* ---------- server check ---------- */
+async function checkServer() {
+  const box = $('#setup');
+  try {
+    const r = await api('/api/health');
+    const d = await r.json();
+    if (d.connected) { box.hidden = true; return; }
+    box.innerHTML = 'Gogo is not connected yet. Add <code>GITHUB_TOKEN=your_token</code> to a <code>.env</code> file next to server.js, then restart <code>node server.js</code>.';
+  } catch {
+    box.innerHTML = 'Gogo\'s server is not running. In this folder run <code>node server.js</code>, then open <code>http://localhost:3000</code>.';
+  }
+  box.hidden = false;
+}
+
+/* ---------- start ---------- */
+checkServer();
+log.append(gogoRow(el('span', { id: 'intro-text', text: introText() })));
+paintGreeting();
+renderBeads();
+setView('home');
+})();
+</script>
+</body>
+</html>
