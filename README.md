@@ -1,4 +1,7 @@
 ﻿# Sensei-Gogo
+
+https://musankosi08.github.io/Sensei-Gogo/
+ 
 A matric study assistant where an animated gogo explains Grade 12 CAPS questions step by step. She answers in the South African language you ask in, and can read questions from photos or Word files. No frameworks and no npm install.
 
 ## Run it
